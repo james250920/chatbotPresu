@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Chatbot</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+/* BOTÓN FLOTANTE */
+
+#chatButton{
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 99999;
+
+    background: linear-gradient(135deg,#0078ff,#00c6ff);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    box-shadow:
+        none;
+
+    transition: all .3s ease;
+}
+
+/* EFECTO HOVER */
+
+#chatButton:hover{
+    transform: translateY(-2px) scale(1.06);
+    box-shadow:
+    none;
+}
+
+#chatButton:active{
+    transform: scale(.98);
+}
+
+/* ICONO */
+
+#chatButton svg{
+    width: 28px;
+    height: 28px;
+    fill: white;
+    filter: none;
+}
+
+/* CONTENEDOR CHAT */
+
+#chatContainer{
+    position: fixed;
+    bottom: 86px;
+    right: 25px;
+
+    width: 320px;
+    height: 500px;
+
+    background: white;
+
+    border: 1px solid rgba(255,255,255,.18);
+
+    border-radius: 22px;
+
+    overflow: hidden;
+
+    z-index: 99998;
+
+    display: none;
+
+    box-shadow:
+        0 18px 50px rgba(0,0,0,.18);
+
+    animation: aparecer .25s ease;
+}
+
+#chatContainer.open{
+    display:block;
+}
+
+/* HEADER */
+
+#chatHeader{
+    display: none;
+}
+
+/* BOTÓN CERRAR */
+
+#closeChat{
+    position: absolute;
+    top: 10px;
+    right: 12px;
+
+    background:none;
+    border:none;
+    color:#fff;
+    font-size:28px;
+    line-height:1;
+    cursor:pointer;
+    opacity:.96;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(0, 92, 70, .9);
+    box-shadow: 0 8px 20px rgba(0,0,0,.16);
+    transition: transform .2s ease, opacity .2s ease, background .2s ease;
+}
+
+#closeChat:hover{
+    transform: scale(1.08);
+    opacity:1;
+    background: rgba(0, 92, 70, 1);
+}
+
+/* IFRAME */
+
+#chatContainer iframe{
+    width:100%;
+    height:100%;
+    border:none;
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 480px){
+
+    #chatContainer{
+        width: calc(100% - 16px);
+        height: min(58vh, 420px);
+        right: 8px;
+        bottom: 72px;
+    }
+
+    #chatButton{
+        width: 56px;
+        height: 56px;
+        right: 15px;
+        bottom: 15px;
+    }
+
+}
+
+/* ANIMACIÓN */
+
+@keyframes aparecer{
+    from{
+        opacity:0;
+        transform: translateY(20px) scale(.95);
+    }
+
+    to{
+        opacity:1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- BOTÓN -->
+
+<button id="chatButton">
+
+<svg viewBox="0 0 24 24">
+<path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM7 9H17V11H7V9ZM13 14H7V12H13V14ZM17 8H7V6H17V8Z"/>
+</svg>
+
+</button>
+
+<!-- CHAT -->
+
+<div id="chatContainer">
+
+    <div id="chatHeader">
+        <button id="closeChat">&times;</button>
+
+    </div>
+
+    <iframe
+    src="https://copilotstudio.microsoft.com/environments/Default-f934e5f7-0088-4bee-a7de-b9ecc5f6941d/bots/cr622_agentTNS7FW/webchat?__version__=2"
+    allow="microphone">
+    </iframe>
+
+</div>
+
+<script>
+
+const chatButton = document.getElementById("chatButton");
+const chatContainer = document.getElementById("chatContainer");
+const closeChat = document.getElementById("closeChat");
+
+chatButton.addEventListener("click", () => {
+
+    chatContainer.classList.toggle("open");
+
+});
+
+closeChat.addEventListener("click", () => {
+    chatContainer.classList.remove("open");
+});
+
+// Close when clicking outside the chatContainer (but ignore clicks on the chatButton)
+document.addEventListener('click', (e) => {
+    if (!chatContainer.classList.contains('open')) return;
+    const target = e.target;
+    if (!chatContainer.contains(target) && target !== chatButton && !chatButton.contains(target)) {
+        chatContainer.classList.remove('open');
+    }
+});
+
+// Close with Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && chatContainer.classList.contains('open')) {
+        chatContainer.classList.remove('open');
+    }
+});
+
+</script>
+
+</body>
+</html>
