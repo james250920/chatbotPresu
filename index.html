@@ -1,217 +1,385 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Chatbot</title>
+<title>Chatbot Bloqueo Real</title>
 
 <style>
+
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial, sans-serif;
+    font-family:Arial,sans-serif;
 }
 
-/* BOTÓN FLOTANTE */
 #chatButton{
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    width: 60px;
-    height: 60px;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 99999;
-    background: #cd202c;
+    position:fixed;
+    bottom:25px;
+    right:25px;
+    width:60px;
+    height:60px;
+    border:none;
+    border-radius:50%;
+    cursor:pointer;
+    z-index:99999;
+    background:#cd202c;
     display:flex;
     align-items:center;
     justify-content:center;
-    box-shadow: none;
-    transition: all .3s ease;
-}
-
-/* NOTIFICACIÓN HOVER */
-#chatTooltip{
-    position: fixed;
-    bottom: 94px;
-    right: 25px;
-    background: rgba(33, 37, 41, .96);
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 10px;
-    font-size: 14px;
-    line-height: 1;
-    box-shadow: 0 10px 24px rgba(0,0,0,.2);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(6px) scale(.98);
-    transition: opacity .2s ease, transform .2s ease, visibility .2s ease;
-    z-index: 99999;
-    pointer-events: none;
-    white-space: nowrap;
-}
-
-#chatTooltip.show{
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-}
-
-#chatButton:hover{
-    transform: translateY(-2px) scale(1.06);
-}
-
-#chatButton:active{
-    transform: scale(.98);
 }
 
 #chatButton svg{
-    width: 28px;
-    height: 28px;
-    fill: white;
+    width:28px;
+    height:28px;
+    fill:white;
 }
 
-/* CONTENEDOR CHAT */
 #chatContainer{
-    position: fixed;
-    bottom: 86px;
-    right: 25px;
-    width: 340px; 
-    height: 520px;
-    background: white;
-    border: 1px solid rgba(0,0,0,.15);
-    border-radius: 22px;
-    overflow: hidden; 
-    z-index: 99998;
-    display: none;
-    box-shadow: 0 18px 50px rgba(0,0,0,.18);
-    animation: aparecer .25s ease;
+    position:fixed;
+    bottom:86px;
+    right:25px;
+    width:340px;
+    height:520px;
+    background:white;
+    border-radius:22px;
+    overflow:hidden;
+    display:none;
+    z-index:99998;
+    border:1px solid rgba(0,0,0,.15);
+    box-shadow:0 18px 50px rgba(0,0,0,.18);
 }
 
 #chatContainer.open{
     display:block;
 }
 
-/* TU NUEVA CABECERA GRIS #555759 */
 #chatHeader{
-    display: flex;
-    align-items: center;
-    background: #555759; /* <--- Color gris exacto aplicado con éxito */
-    color: white;
-    padding: 0 20px;
-    font-size: 16px;
-    font-weight: bold;
-    height: 55px; 
-    position: relative;
-    z-index: 99999; 
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    height:55px;
+    background:#555759;
+    color:white;
+    display:flex;
+    align-items:center;
+    padding:0 20px;
+    font-size:16px;
+    font-weight:bold;
 }
 
-/* CONTENEDOR DE RECORTE COMPLETO */
-.iframe-wrapper {
-    width: 100%;
-    height: calc(100% - 55px); 
-    overflow: hidden; 
-    position: relative;
-    background: #ffffff;
+.iframe-wrapper{
+    position:relative;
+    width:100%;
+    height:calc(100% - 55px);
+    overflow:hidden;
+    background:#fff;
 }
 
-/* RECORTE DEL IFRAME */
-#chatContainer iframe{
-    width: 100%;
-    height: calc(100% + 56px); 
-    margin-top: -56px; 
-    border: none;
-    display: block;
+/* IFRAME */
+#chatFrame{
+    position:absolute;
+    top:-56px;
+    left:0;
+    width:100%;
+    height:calc(100% + 56px);
+    border:none;
+    display:block;
+    z-index:1;
 }
 
-/* RESPONSIVE */
-@media(max-width: 480px){
-    #chatContainer{
-        width: calc(100% - 16px);
-        height: min(70vh, 500px);
-        right: 8px;
-        bottom: 72px;
-    }
+/* DEBUG PANEL */
+#debugCounterPanel{
+    position:absolute;
+    top:10px;
+    left:10px;
+    background:rgba(0,0,0,.85);
+    color:#fff;
+    padding:10px;
+    border-radius:8px;
+    font-size:11px;
+    line-height:1.4;
+    z-index:200;
 }
 
-/* ANIMACIÓN */
-@keyframes aparecer{
-    from{
-        opacity:0;
-        transform: translateY(20px) scale(.95);
-    }
-    to{
-        opacity:1;
-        transform: translateY(0) scale(1);
-    }
+#debugCounterPanel span{
+    color:#00ffcc;
+    font-weight:bold;
 }
+
+/* SENSOR INVISIBLE */
+#sensorClicks{
+    position:absolute;
+    bottom:0;
+    right:0;
+    width:40px;
+    height:45px;
+    z-index:9999;
+    cursor:pointer;
+
+    background:transparent;
+    border:none;
+
+    opacity:0;
+
+    transition:opacity .2s ease;
+}
+
+/* DEBUG HOVER OPCIONAL */
+#sensorClicks:hover{
+    opacity:.08;
+    background:#007bff;
+}
+
+/* OVERLAY */
+#chatOverlay{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    height:45px;
+    background:#cd202c;
+    color:white;
+    z-index:10000;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    font-weight:bold;
+}
+
+#chatOverlay.active{
+    display:flex;
+}
+
+/* MENSAJE LIMITE */
+#mensajeLimite{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:30px;
+    font-size:18px;
+    font-weight:bold;
+    color:#555;
+    background:#fff;
+    position:relative;
+    z-index:2;
+}
+
 </style>
 </head>
 
 <body>
 
-<div id="chatTooltip">Chatbot Presupuesto</div>
-
 <button id="chatButton">
-    <svg viewBox="0 0 24 24">
-        <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM7 9H17V11H7V9ZM13 14H7V12H13V14ZM17 8H7V6H17V8Z"/>
-    </svg>
+
+<svg viewBox="0 0 24 24">
+<path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z"/>
+</svg>
+
 </button>
 
 <div id="chatContainer">
-    <div id="chatHeader">PresuBot</div>
 
-    <div class="iframe-wrapper">
-        <iframe
-        src="https://copilotstudio.microsoft.com/environments/Default-f934e5f7-0088-4bee-a7de-b9ecc5f6941d/bots/cr622_agentTNS7FW/webchat?__version__=2&bg=ffffff"
-        allow="microphone">
-        </iframe>
-    </div>
+<div id="chatHeader">
+PresuBot
+</div>
+
+<div class="iframe-wrapper">
+
+<div id="debugCounterPanel">
+
+<div>Total: <span id="valTotal">0</span> / 10</div>
+
+<div>Clicks: <span id="valClics">0</span></div>
+
+</div>
+
+<div id="sensorClicks"></div>
+
+<div id="chatOverlay">
+CHAT BLOQUEADO
+</div>
+
+<iframe
+id="chatFrame"
+src="https://copilotstudio.microsoft.com/environments/Default-f934e5f7-0088-4bee-a7de-b9ecc5f6941d/bots/cr622_agentTNS7FW/webchat?__version__=2&bg=ffffff">
+</iframe>
+
+</div>
 </div>
 
 <script>
-// LÓGICA DE APERTURA Y CIERRES
-const chatButton = document.getElementById("chatButton");
+
+const CHAT_URL = "https://copilotstudio.microsoft.com/environments/Default-f934e5f7-0088-4bee-a7de-b9ecc5f6941d/bots/cr622_agentTNS7FW/webchat?__version__=2&bg=ffffff";
+
+const chatButton    = document.getElementById("chatButton");
 const chatContainer = document.getElementById("chatContainer");
-const chatTooltip = document.getElementById("chatTooltip");
+const chatOverlay   = document.getElementById("chatOverlay");
+const sensorClicks  = document.getElementById("sensorClicks");
+
+let chatFrame       = document.getElementById("chatFrame");
+
+const valTotal      = document.getElementById("valTotal");
+const valClics      = document.getElementById("valClics");
+
+const LIMITE = 10;
+
+let clicsContados = Number(localStorage.getItem("clicsContados")) || 0;
+
+/* BORRAR STORAGE AL RECARGAR */
+window.addEventListener("beforeunload", () => {
+
+    localStorage.removeItem("clicsContados");
+
+});
+
+actualizarPanel();
+
+function actualizarPanel(){
+
+    valTotal.textContent = clicsContados;
+
+    valClics.textContent = clicsContados;
+
+}
+
+function bloquearChat(){
+
+    chatOverlay.classList.add("active");
+
+    sensorClicks.style.display = "none";
+
+    if(chatFrame){
+
+        chatFrame.remove();
+
+    }
+
+    if(document.getElementById("mensajeLimite")) return;
+
+    const mensaje = document.createElement("div");
+
+    mensaje.id = "mensajeLimite";
+
+    mensaje.innerHTML = "Has alcanzado al límite de mensajes por hoy";
+
+    document.querySelector(".iframe-wrapper").appendChild(mensaje);
+
+    console.log("CHAT BLOQUEADO");
+
+}
+
+function desbloquearChat(){
+
+    clicsContados = 0;
+
+    localStorage.removeItem("clicsContados");
+
+    actualizarPanel();
+
+    chatOverlay.classList.remove("active");
+
+    sensorClicks.style.display = "block";
+
+    const mensaje = document.getElementById("mensajeLimite");
+
+    if(mensaje){
+
+        mensaje.remove();
+
+    }
+
+    chatFrame = document.createElement("iframe");
+
+    chatFrame.id = "chatFrame";
+
+    chatFrame.src = CHAT_URL;
+
+    document.querySelector(".iframe-wrapper").appendChild(chatFrame);
+
+    console.log("CHAT DESBLOQUEADO");
+
+}
+
+function contarClick(){
+
+    clicsContados++;
+
+    localStorage.setItem("clicsContados", clicsContados);
+
+    actualizarPanel();
+
+    console.log("Clicks:", clicsContados);
+
+    if(clicsContados >= LIMITE){
+
+        bloquearChat();
+
+    }
+
+}
+
+/* CLICK SENSOR */
+sensorClicks.addEventListener("click", () => {
+
+    if(clicsContados >= LIMITE) return;
+
+    /* DESAPARECER TEMPORALMENTE */
+    sensorClicks.style.pointerEvents = "none";
+
+    sensorClicks.style.display = "none";
+
+    /* CONTAR CLICK */
+    contarClick();
+
+    /* VOLVER EN 1.5 SEGUNDOS */
+    setTimeout(() => {
+
+        if(clicsContados < LIMITE){
+
+            sensorClicks.style.display = "block";
+
+            sensorClicks.style.pointerEvents = "auto";
+
+        }
+
+    }, 1500);
+
+});
 
 chatButton.addEventListener("click", () => {
+
     chatContainer.classList.toggle("open");
+
 });
 
-chatButton.addEventListener("mouseenter", () => {
-    chatTooltip.classList.add("show");
-});
+document.addEventListener("click", (e) => {
 
-chatButton.addEventListener("mouseleave", () => {
-    chatTooltip.classList.remove("show");
-});
+    if(!chatContainer.classList.contains("open")) return;
 
-window.addEventListener("load", () => {
-    chatTooltip.classList.add("show");
-    setTimeout(() => {
-        chatTooltip.classList.remove("show");
-    }, 3000);
-});
+    if(
+        !chatContainer.contains(e.target) &&
+        e.target !== chatButton &&
+        !chatButton.contains(e.target)
+    ){
 
-document.addEventListener('click', (e) => {
-    if (!chatContainer.classList.contains('open')) return;
-    const target = e.target;
-    if (!chatContainer.contains(target) && target !== chatButton && !chatButton.contains(target)) {
-        chatContainer.classList.remove('open');
+        chatContainer.classList.remove("open");
+
     }
+
 });
 
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && chatContainer.classList.contains('open')) {
-        chatContainer.classList.remove('open');
-    }
-});
+actualizarPanel();
+
+if(clicsContados >= LIMITE){
+
+    bloquearChat();
+
+}
+
 </script>
 
 </body>
